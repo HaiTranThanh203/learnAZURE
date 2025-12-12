@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-backend
+  template:
+    metadata:
+      labels:
+        app: api-backend
+    spec:
+      # --- THÊM 2 DÒNG NÀY (Thẳng hàng với containers) ---
+      imagePullSecrets:
+      - name: acr-secret
+      # ---------------------------------------------------
+      containers:
+      - name: api-container
+        image: mindxregistryhai01.azurecr.io/my-api-image:v1
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"

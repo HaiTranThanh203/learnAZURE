@@ -1,0 +1,12 @@
+# k8s/api-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  type: ClusterIP      # Chỉ cho phép truy cập nội bộ (theo Step 2.5)
+  selector:
+    app: api-backend
+  ports:
+    - port: 3000         # Port ảo của Service  
+      targetPort: 3000 # Port thật của Container

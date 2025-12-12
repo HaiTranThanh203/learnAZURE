@@ -14,6 +14,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.json({ message: "Hello interview!" });
 });
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Service is healthy' });
+});
 app.use("/api/auth", authRoute);
 app.use("/api/todos",todoRoute);
 app.use((req, res, next) => {

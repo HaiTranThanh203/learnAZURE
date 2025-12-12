@@ -14,31 +14,31 @@ spec:
     spec:
       # Cấu hình Secret để lấy ảnh từ ACR
       imagePullSecrets:
-      - name: acr-secret
-      
+        - name: acr-secret
+
       containers:
-      - name: api-container
-        # Đã cập nhật lên phiên bản v2
-        image: mindxregistryhai01.azurecr.io/my-api-image:v2
-        ports:
-        - containerPort: 3000
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-            
-        # --- THÊM PHẦN TỰ ĐỘNG CHECK NÀY VÀO ---
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 15
-          periodSeconds: 10
-        
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        # ----------------------------------------
+        - name: api-container
+          # Đã cập nhật lên phiên bản v3
+          image: mindxregistryhai01.azurecr.io/my-api-image:v3
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+          # --- THÊM PHẦN TỰ ĐỘNG CHECK NÀY VÀO ---
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          # ----------------------------------------

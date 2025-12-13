@@ -19,8 +19,8 @@ app.get("/", (req, res) => {
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Service is healthy' });
 });
-app.use("/api/auth", authRoute);
-app.use("/api/todos",todoRoute);
+app.use("/auth", authRoute);
+app.use("/todos",todoRoute);
 app.use((req, res, next) => {
   next(createError(404, "Not Found"));
 });

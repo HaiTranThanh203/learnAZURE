@@ -1,3 +1,4 @@
+#  k8s/api-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,7 +20,7 @@ spec:
       containers:
         - name: api-container
           # Đã cập nhật lên phiên bản v3
-          image: mindxregistryhai01.azurecr.io/my-api-image:v3
+          image: mindxregistryhai01.azurecr.io/my-api-image:v4
           ports:
             - containerPort: 3000
           resources:

@@ -4,10 +4,13 @@ const morgan = require("morgan");
 const createError = require("http-errors");
 const connectDB = require("./config/db");
 const todoRoute = require("./routes/todo.route");
-const cors = require('cors');
+const employeeRoute = require("./routes/employee.route");
+const productRoute = require("./routes/product.route");
+const cors = require("cors");
 const app = express();
-app.use(cors());
+const authMiddleware = require("./middleware/authMiddleware"); 
 const authRoute = require("./routes/auth.route");
+app.use(cors());
 connectDB();
 app.use(morgan("dev"));
 app.use(express.json());
@@ -16,11 +19,13 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.json({ message: "Hello interview!" });
 });
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'Service is healthy' });
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", message: "Service is healthy" });
 });
 app.use("/auth", authRoute);
-app.use("/todos",todoRoute);
+app.use("/todos", todoRoute);
+app.use("/employees",authMiddleware, employeeRoute);
+app.use("/products",authMiddleware, productRoute);
 app.use((req, res, next) => {
   next(createError(404, "Not Found"));
 });

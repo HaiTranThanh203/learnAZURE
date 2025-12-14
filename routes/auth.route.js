@@ -1,35 +1,37 @@
+// src/routes/auth.route.js (TẠO LẠI ĐỂ MOCK TOKEN)
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
-
+// Mock user (không cần kết nối DB)
 const DEMO_USER = {
-  id: '123',
-  username: 'test',
-  password: '123456'
+  id: 'abc-123',
+  username: 'testuser',
 };
 
 router.post('/login', (req, res) => {
-  const { username, password } = req.body;
+    // Chỉ cần username để demo tạo token
+    const { username } = req.body; 
 
-  // Check đơn giản
-  if (username !== DEMO_USER.username || password !== DEMO_USER.password) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
+    if (username !== DEMO_USER.username) {
+        return res.status(401).json({ message: 'Mock login failed' });
+    }
 
-  const payload = {
-    userId: DEMO_USER.id,
-    username: DEMO_USER.username,
-    hello: 'test'
-  };
+    const payload = {
+        sub: DEMO_USER.id, // 'sub' là trường chuẩn của JWT/OIDC (subject)
+        preferred_username: DEMO_USER.username,
+        azp: process.env.OIDC_CLIENT_ID || 'mock-client',
+        // Thêm các trường chuẩn khác để giống token thật
+    };
 
-  const token = jwt.sign(
-    payload,
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
-  );
+    // Ký token bằng khóa bí mật local
+    const token = jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+    );
 
-  return res.json({ token });
+    return res.json({ token });
 });
 
 module.exports = router;

@@ -1,32 +1,10 @@
-// src/middleware/authMiddleware.js (ĐÃ SỬA)
+// src/middleware/authMiddleware.js (ĐÃ SỬA CHUẨN XÁC)
 const jwt = require('jsonwebtoken');
 const { JwksClient } = require('jwks-rsa');
 
-// Lấy chế độ chạy hiện tại
+// ... (Giữ nguyên cấu hình OIDC và hàm getKey ở trên) ...
 const MOCK_ENABLED = process.env.MOCK_AUTH_ENABLED === 'true'; 
-
-// --- CẤU HÌNH OIDC (Chỉ dùng khi MOCK_ENABLED=false) ---
-const IDP_URL = 'https://id-dev.mindx.edu.vn';
-const JWKS_URI = `${IDP_URL}/auth/realms/MindX/protocol/openid-connect/certs`; 
-
-const client = new JwksClient({
-    jwksUri: JWKS_URI,
-    cache: true,
-    cacheMaxAge: 86400000,
-});
-
-function getKey(header, callback) {
-    // ... (Hàm này giữ nguyên như trước, chỉ dùng cho chế độ OIDC)
-    client.getSigningKey(header.kid, (err, key) => {
-        if (err) {
-            console.error('Error fetching signing key:', err.message);
-            return callback(err);
-        }
-        const signingKey = key.publicKey || key.rsaPublicKey;
-        callback(null, signingKey);
-    });
-}
-// --------------------------------------------------------
+// ...
 
 module.exports = function auth(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -37,39 +15,27 @@ module.exports = function auth(req, res, next) {
 
     const token = authHeader.split(' ')[1];
 
-    if (MOCK_ENABLED) {
-        // === CHẾ ĐỘ 1: MOCK AUTH (Tự ký/Tự xác minh) ===
-        try {
-            // Xác minh token bằng khóa bí mật local
-            const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-            req.user = decoded;
-            return next();
-        } catch (err) {
-            console.error('MOCK JWT Verification Failed:', err.message);
-            return res.status(401).json({ message: 'Invalid or expired mock token' });
-        }
+    // LƯU Ý QUAN TRỌNG:
+    // Token mà Frontend gửi lên route /employees là App Token (JWT) do Backend tự tạo ra 
+    // sau khi gọi MindX thành công. Token này được ký bằng JWT_SECRET (Khóa đối xứng).
 
-    } else {
-        // === CHẾ ĐỘ 2: OIDC THẬT (Xác minh bằng JWKS) ===
-        // BƯỚC 1: Giải mã token để lấy header
-        const decodedHeader = jwt.decode(token, { complete: true });
-
-        if (!decodedHeader) {
-            return res.status(401).json({ message: 'Invalid token format' });
-        }
-
-        // BƯỚC 2: Xác minh chữ ký token bằng khóa công khai (dùng hàm getKey)
-        jwt.verify(token, getKey, {
-            algorithms: ['RS256'],
-            audience: process.env.OIDC_CLIENT_ID, 
-            issuer: `${IDP_URL}/auth/realms/MindX`,
-        }, (err, decoded) => {
-            if (err) {
-                console.error('OIDC JWT Verification Failed:', err.message);
-                return res.status(401).json({ message: 'Invalid or expired OIDC token', error: err.message });
-            }
-            req.user = decoded; 
-            next();
-        });
+    // === XÁC MINH APP TOKEN BẰNG KHÓA ĐỐI XỨNG ===
+    try {
+        // Luôn sử dụng JWT_SECRET để xác minh App Token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); 
+        req.user = decoded;
+        return next();
+    } catch (err) {
+        // Nếu xác minh thất bại (sai Secret, hết hạn)
+        console.error('App JWT Verification Failed (Invalid Secret or Expired):', err.message);
+        return res.status(401).json({ message: 'Invalid or expired authentication token' });
     }
+
+    /* KHỐI LOGIC OIDC NÀY ĐÃ BỊ LOẠI BỎ vì nó chỉ dùng để xác minh Token do MindX cấp 
+    (chứ không phải Token do App của bạn cấp) 
+    
+    if (!MOCK_ENABLED) { 
+        // Logic cũ: sai vì cố dùng OIDC để xác minh App Token 
+    } 
+    */
 };

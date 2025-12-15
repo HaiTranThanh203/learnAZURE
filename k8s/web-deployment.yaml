@@ -21,7 +21,7 @@ spec:
       containers:
         - name: web-app
           # Cập nhật tên kho mới và tên ảnh bạn vừa push
-          image: mindxregistryhai01.azurecr.io/my-frontend-image:v3
+          image: mindxregistryhai01.azurecr.io/my-frontend-image:v5
           ports:
             - containerPort: 3000
           resources:

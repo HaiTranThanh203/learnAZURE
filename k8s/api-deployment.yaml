@@ -20,7 +20,7 @@ spec:
       containers:
         - name: api-container
           # Đã cập nhật lên phiên bản v3
-          image: mindxregistryhai01.azurecr.io/my-api-image:v4
+          image: mindxregistryhai01.azurecr.io/my-api-image:v5
           ports:
             - containerPort: 3000
           resources:

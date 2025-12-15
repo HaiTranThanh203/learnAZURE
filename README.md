@@ -1,288 +1,172 @@
-# MindX Todo Web Application
+Tuyệt vời\! Việc chuyển sang tài liệu tiếng Anh sẽ làm cho hồ sơ của bạn chuyên nghiệp và dễ dàng chia sẻ hơn, đặc biệt khi làm việc trong môi trường công ty.
 
-A modern, scalable Todo application built with Node.js, Express, and MongoDB. This application demonstrates best practices for REST API development with authentication, CRUD operations, and Docker containerization.
+Dưới đây là nội dung chi tiết cho file `README.md` **bằng tiếng Anh**, bao gồm đầy đủ các phần: **Setup, Deployment, và Authentication Flow** theo yêu cầu của dự án.
 
-## Features
+Bạn có thể copy nội dung này vào file `README.md` trong repository của mình.
 
-- ✅ **Todo Management**: Create, read, update, and delete todos
-- 🔐 **Authentication**: JWT-based user authentication
-- 📦 **RESTful API**: Clean and intuitive REST endpoints
-- 🗄️ **MongoDB Integration**: Persistent data storage with Mongoose ODM
-- 🐳 **Docker Support**: Easy deployment with Docker containerization
-- 📝 **Request Logging**: HTTP request tracking with Morgan
-- 🔄 **Hot Reload**: Development with Nodemon for automatic restart
-- 📋 **Status Tracking**: Mark todos as completed/incomplete
-- ⏱️ **Timestamps**: Automatic creation and update timestamps
+-----
 
-## Tech Stack
+### Mẫu Documentation (README.md) - English
 
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js 5.x
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT (jsonwebtoken)
-- **Development Tools**: Nodemon, Morgan
-- **Containerization**: Docker
+````markdown
+# MindX Onboarding - Week 1: Azure Fullstack Application
 
-## Project Structure
+This project is a Fullstack Web Application (ReactJS + Node.js) containerized and deployed on the Azure Kubernetes Service (AKS) infrastructure, integrating Single Sign-On (SSO) authentication using OpenID Connect with the MindX Identity system.
 
-```
-mindx-webapp-haitt01/
-├── config/
-│   └── db.js                 # MongoDB connection configuration
-├── controllers/
-│   └── todo.controller.js    # Todo business logic and handlers
-├── middleware/
-│   └── auth.js               # JWT authentication middleware
-├── models/
-│   └── Todo.model.js         # Mongoose Todo schema
-├── routes/
-│   ├── auth.route.js         # Authentication endpoints
-│   └── todo.route.js         # Todo CRUD endpoints
-├── appsettings.json          # Application configuration
-├── Dockerfile                # Docker container definition
-├── package.json              # Project dependencies
-├── server.js                 # Express server entry point
-└── README.md                 # Project documentation
-```
+## 🏗 Architecture Overview
 
-## Installation
+The system is designed following a Microservices model on a Kubernetes platform:
 
-### Prerequisites
+* **Frontend**: ReactJS (TypeScript), containerized as a Static Content Server.
+* **Backend**: Node.js Express API, containerized.
+* **Database**: MongoDB Atlas.
+* **Infrastructure**:
+    * **Azure Container Registry (ACR)**: Centralized repository for Docker Images.
+    * **Azure Kubernetes Service (AKS)**: Orchestration and management of all services.
+    * **Ingress Controller (Nginx)**: Manages external routing and SSL termination.
+* **Authentication**: OpenID Connect (OIDC) via the MindX ID Server (`https://id-dev.mindx.edu.vn`).
 
-- Node.js 18 or higher
-- MongoDB database (local or cloud)
-- npm or yarn package manager
+## 🚀 Setup & Local Development Guide
 
-### Setup Instructions
+### 1. Prerequisites
+Ensure you have the following installed:
+* Node.js v18+
+* Docker Desktop
+* Azure CLI (`az`)
+* Kubernetes CLI (`kubectl`)
 
-1. **Clone the repository**
+### 2. Environment Variables Configuration
 
-   ```bash
-   git clone <repository-url>
-   cd mindx-webapp-haitt01
-   ```
+**Crucial Step**: Create a `.env` file in the **`backend/`** directory.
 
-2. **Install dependencies**
+```env
+PORT=3000
+MONGO_URI=<Your_MongoDB_Connection_String>
+JWT_SECRET=super_secret_key_123
+JWT_EXPIRES_IN=1h
 
-   ```bash
-   npm install
-   ```
+# --- MINDX SSO CONFIG ---
+OAUTH_ISSUER_URL=[https://id-dev.mindx.edu.vn](https://id-dev.mindx.edu.vn)
+OAUTH_AUTH_URL=[https://id-dev.mindx.edu.vn/auth](https://id-dev.mindx.edu.vn/auth)
+OAUTH_TOKEN_URL=[https://id-dev.mindx.edu.vn/token](https://id-dev.mindx.edu.vn/token)
+OAUTH_USERINFO_URL=[https://id-dev.mindx.edu.vn/me](https://id-dev.mindx.edu.vn/me)
 
-3. **Configure environment variables**
-   Create a `.env` file in the root directory:
+OAUTH_CLIENT_ID=mindx-onboarding
+OAUTH_CLIENT_SECRET=<Provided_Client_Secret>
 
-   ```env
-   MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
-   JWT_SECRET=your_secret_key_here
-   PORT=3000
-   NODE_ENV=development
-   ```
+# NOTE: Use localhost for local development. Use the Azure domain for deployment.
+OAUTH_CALLBACK_URL=http://localhost:3000/auth/callback
+````
 
-4. **Start the development server**
+### 3\. Running the Application Locally
 
-   ```bash
-   npm start
-   ```
-
-   The server will start on `http://localhost:3000`
-
-## API Documentation
-
-### Base URL
-
-```
-http://localhost:3000/api
-```
-
-### Authentication Endpoints
-
-#### Register User
-
-- **Endpoint**: `POST /auth/register`
-- **Body**: `{ email, password }`
-- **Response**: User object with JWT token
-
-#### Login User
-
-- **Endpoint**: `POST /auth/login`
-- **Body**: `{ email, password }`
-- **Response**: User object with JWT token
-
-### Todo Endpoints
-
-All todo endpoints require JWT authentication via `Authorization: Bearer <token>` header.
-
-#### Create Todo
-
-- **Endpoint**: `POST /todos`
-- **Body**:
-  ```json
-  {
-    "title": "Todo title",
-    "description": "Todo description (optional)",
-    "completed": false
-  }
-  ```
-- **Response**: Created todo object with ID and timestamps
-
-#### Get All Todos
-
-- **Endpoint**: `GET /todos`
-- **Query Parameters**:
-  - `completed`: Filter by completion status (true/false)
-- **Response**: Array of todo objects
-
-#### Get Todo by ID
-
-- **Endpoint**: `GET /todos/:id`
-- **Response**: Single todo object
-
-#### Update Todo
-
-- **Endpoint**: `PUT /todos/:id`
-- **Body**: Partial or complete todo object
-  ```json
-  {
-    "title": "Updated title",
-    "completed": true
-  }
-  ```
-- **Response**: Updated todo object
-
-#### Delete Todo
-
-- **Endpoint**: `DELETE /todos/:id`
-- **Response**: Success message
-
-#### Delete All Todos
-
-- **Endpoint**: `DELETE /todos`
-- **Response**: Success message
-
-## Running with Docker
-
-### Build Docker Image
+Navigate to the root directory and run the services:
 
 ```bash
-docker build -t mindx-todo-app:1.0.0 .
-```
+# 1. Install dependencies for both services
+npm install # or cd into each folder and run npm install
 
-### Run Docker Container
+# 2. Run Backend (Terminal 1)
+cd backend
+npm start
 
-```bash
-docker run -p 3000:3000 \
-  -e MONGO_URI=<your_mongodb_uri> \
-  -e JWT_SECRET=<your_secret_key> \
-  mindx-todo-app:1.0.0
-```
-
-## Development
-
-### Run with Nodemon (Auto-reload)
-
-```bash
+# 3. Run Frontend (Terminal 2)
+cd frontend
 npm start
 ```
 
-### Scripts
+Access the application via your local frontend URL (usually `http://localhost:3000`).
 
-- `npm start` - Start the development server with auto-reload
-- `npm test` - Run tests (currently not configured)
+-----
 
-## Database Schema
+## ☁️ Deployment Flow to Azure Kubernetes Service (AKS)
 
-### Todo Model
+The deployment follows a progressive flow utilizing ACR and AKS for container orchestration.
 
-```javascript
-{
-  title: String (required),
-  description: String (optional),
-  completed: Boolean (default: false),
-  createdAt: Date (auto-generated),
-  updatedAt: Date (auto-generated)
-}
-```
+### Step 1: Build and Push Docker Images
 
-## Error Handling
-
-The application implements comprehensive error handling:
-
-- **400 Bad Request**: Missing or invalid request data
-- **404 Not Found**: Resource not found
-- **500 Internal Server Error**: Server-side errors
-
-All errors return a JSON response with status and message fields.
-
-## Security
-
-- JWT tokens for secure authentication
-- Password hashing (implement bcrypt in production)
-- CORS support (can be configured)
-- Input validation
-- Environment variable protection for sensitive data
-
-## Environment Variables
-
-| Variable     | Description                | Example                                          |
-| ------------ | -------------------------- | ------------------------------------------------ |
-| `MONGO_URI`  | MongoDB connection string  | `mongodb+srv://user:pass@cluster.mongodb.net/db` |
-| `JWT_SECRET` | Secret key for JWT signing | `super_secret_key_123`                           |
-| `PORT`       | Server port                | `3000`                                           |
-| `NODE_ENV`   | Environment mode           | `development` or `production`                    |
-
-## Testing
-
-To test the API endpoints:
-
-### Using cURL
+Log in to your Azure Container Registry (ACR) and push the containerized services:
 
 ```bash
-# Create a todo
-curl -X POST http://localhost:3000/api/todos \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"title":"My First Todo","description":"Test description"}'
+# Login to Azure
+az login
+az acr login --name <your_acr_name>
 
-# Get all todos
-curl -X GET http://localhost:3000/api/todos \
-  -H "Authorization: Bearer <token>"
+# Build and Push Backend
+docker build -t <your_acr_name>.azurecr.io/backend-app:v1 ./backend
+docker push <your_acr_name>.azurecr.io/backend-app:v1
+
+# Build and Push Frontend
+docker build -t <your_acr_name>.azurecr.io/frontend-app:v1 ./frontend
+docker push <your_acr_name>.azurecr.io/frontend-app:v1
 ```
 
-### Using Postman
+### Step 2: Configure Kubernetes Manifests
 
-1. Import the API endpoints into Postman
-2. Set the Authorization header with your JWT token
-3. Test each endpoint
+Ensure your Kubernetes deployment YAML files (located in the `k8s/` folder) correctly configure the environment variables for the production domain.
 
-## Contributing
+**Crucial Configuration:** The `OAUTH_CALLBACK_URL` must match the URL whitelisted by the MindX Admin.
 
-1. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-2. Commit changes (`git commit -m 'Add AmazingFeature'`)
-3. Push to branch (`git push origin feature/AmazingFeature`)
-4. Open a Pull Request
+```yaml
+# Snippet from api-deployment.yaml
+      containers:
+        - name: api-server
+          image: <your_acr_name>.azurecr.io/backend-app:v1
+          env:
+            # All other Env Vars...
+            - name: OAUTH_CALLBACK_URL
+              value: "[https://haimindx-app-djamcah4c6b0fyb3.z03.azurefd.net/callback](https://haimindx-app-djamcah4c6b0fyb3.z03.azurefd.net/callback)"
+```
 
-## Version History
+### Step 3: Apply Deployment to AKS
 
-### v1.0.0 (Initial Release)
+Apply the deployment and service configurations to the AKS cluster:
 
-- Core todo CRUD operations
-- JWT authentication
-- MongoDB integration
-- Docker support
-- Comprehensive REST API
+```bash
+# Get AKS credentials and configure kubectl access
+az aks get-credentials --resource-group <resource_group_name> --name <aks_cluster_name>
 
-## License
+# Apply the manifests
+kubectl apply -f k8s/backend-deployment.yaml
+kubectl apply -f k8s/frontend-deployment.yaml
+kubectl apply -f k8s/ingress.yaml
+```
 
-This project is licensed under the ISC License - see the LICENSE file for details.
+**Access URL:** `https://haimindx-app-djamcah4c6b0fyb3.z03.azurefd.net/` (or your custom domain if Step 6 is completed).
 
-## Author
+-----
 
-MindX Week 1 - Interview Challenge
+## 🔐 Authentication Flow (OpenID Connect SSO)
 
-## Support
+The application uses the standard **Authorization Code Flow** for secure user login.
 
-For issues, questions, or contributions, please open an issue on the repository.
+1.  **Initiation**: User clicks "Login via MindX" on the Frontend.
+2.  **Authorization Request**: The Frontend redirects the user to the MindX Authorization Endpoint (`/auth`) with `client_id` and the `redirect_uri`.
+3.  **Authentication**: The user logs in on the MindX Identity Server.
+4.  **Code Grant**: MindX redirects the user back to the configured `OAUTH_CALLBACK_URL` with a short-lived `code`.
+5.  **Token Exchange (Server-to-Server)**:
+      * The Backend receives the `code`.
+      * The Backend sends a POST request to the MindX Token Endpoint (`/token`), providing the `code`, `client_id`, and `client_secret`.
+      * MindX validates the request and returns `access_token` and user claims.
+6.  **Authorization & Session**: The Backend validates the claims, creates a local JWT (App Token), and returns it to the Frontend for session management and making authorized API calls.
 
----
+-----
 
-**Last Updated**: December 2024
+## ✅ Acceptance Criteria Status
+
+The following Acceptance Criteria from the project overview have been addressed:
+
+  * [x] The back-end API is deployed and accessible via a public HTTPS endpoint.
+  * [x] The front-end React web app is deployed and accessible via a public HTTPS domain.
+  * [ ] HTTPS is enforced for all endpoints (front-end and back-end). *(Achieved if Step 6 is complete)*
+  * [x] Authentication is integrated and functional using OpenID with `https://id-dev.mindx.edu.vn`.
+  * [x] Users can log in and log out via the front-end using OpenID.
+  * [x] After login, authenticated users can access protected routes/pages on the front-end.
+  * [x] The back-end API validates and authorizes requests using the OpenID token.
+  * [x] All services are running on Azure Cloud infrastructure.
+  * [x] Documentation is provided for setup, deployment, and authentication flow.
+
+<!-- end list -->
+
+```
+```

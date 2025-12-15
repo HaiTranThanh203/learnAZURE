@@ -1,14 +1,13 @@
-# k8s/ingress-frontend.yaml (SỬA LẠI CHO HTTP)
+# ingress-web-final.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: web-ingress
+  name: web-ingress-final
   annotations:
     kubernetes.io/ingress.class: nginx
-    # ❗ ĐÃ XÓA MỌI ANNOTATION CỦA CERT-MANAGER VÀ SSL-REDIRECT ❗
+    # KHÔNG CÓ dòng rewrite-target ở đây
 spec:
   ingressClassName: nginx
-  # ❗ ĐÃ XÓA KHỐI TLS ❗
   rules:
     - http:
         paths:

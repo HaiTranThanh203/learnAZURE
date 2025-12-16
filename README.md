@@ -25,6 +25,21 @@ The system is designed following a Microservices model on a Kubernetes platform:
     * **Azure Kubernetes Service (AKS)**: Orchestration and management of all services.
     * **Ingress Controller (Nginx)**: Manages external routing and SSL termination.
 * **Authentication**: OpenID Connect (OIDC) via the MindX ID Server (`https://id-dev.mindx.edu.vn`).
+## 🏗 Architecture Diagram
+
+```mermaid
+graph TD
+    User((User Browser)) -->|HTTPS:443| AFD[Azure Front Door]
+    AFD -->|Routing| ING[Nginx Ingress Controller]
+    
+    subgraph AKS_Cluster [Azure Kubernetes Service]
+        ING -->|/| FE[Frontend Pod: React]
+        ING -->|/api| BE[Backend Pod: Node.js]
+        BE -->|Internal| MONGO[(MongoDB Atlas)]
+    end
+
+    BE -.->|OIDC Flow - Mocked| MX[MindX ID Server]
+    User -->|Redirect Login| MX
 
 ## 🚀 Setup & Local Development Guide
 
@@ -166,6 +181,15 @@ The following Acceptance Criteria from the project overview have been addressed:
   * [x] All services are running on Azure Cloud infrastructure.
   * [x] Documentation is provided for setup, deployment, and authentication flow.
 
+🛠 Technical Challenges & Workarounds
+Issue: SSL/TLS Protocol Mismatch (EPROTO Error)
+During integration with the MindX Identity Server, the Backend encountered an EPROTO: wrong version number error during the server-to-server TLS handshake (/token endpoint).
+
+Root Cause: Incompatibility in SSL/TLS protocol versions/ciphers between the Node.js runtime on AKS and the destination server.
+
+Attempted Fixes: Downgrading Node.js to version 16, using NODE_TLS_REJECT_UNAUTHORIZED=0, and configuring specific TLS ciphers.
+
+Final Workaround: Implemented Mock Authentication. When MOCK_AUTH_ENABLED=true, the backend bypasses the external token exchange and generates a valid local JWT to allow testing of protected routes and application logic.
 <!-- end list -->
 
 ```

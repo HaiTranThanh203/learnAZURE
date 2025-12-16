@@ -18,6 +18,9 @@ appsettings.json
 *~
 .DS_Store
 
+k8s/
+
+
 # OS
 Thumbs.db
 .DS_Store

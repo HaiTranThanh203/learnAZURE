@@ -1,0 +1,20 @@
+# ingress-web-final.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress-final
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # KHÔNG CÓ dòng rewrite-target ở đây
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 8080

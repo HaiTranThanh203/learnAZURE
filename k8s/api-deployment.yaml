@@ -1,0 +1,76 @@
+# k8s/api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-backend
+  template:
+    metadata:
+      labels:
+        app: api-backend
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+        - name: api-container
+          image: mindxregistryhai01.azurecr.io/my-api-image:v8
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+          # --- CẤU HÌNH ENV (Đã tách Secret) ---
+          env:
+            - name: MOCK_AUTH_ENABLED
+              value: "true"
+            
+            # --- CẤU HÌNH LẤY TỪ SECRET (Bảo mật) ---
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets  # Tên secret đã tạo ở bước trên
+                  key: MONGO_URI
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: JWT_SECRET
+            - name: OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: OAUTH_CLIENT_SECRET
+
+            # --- CẤU HÌNH CÔNG KHAI (Có thể để trong YAML) ---
+            - name: JWT_EXPIRES_IN
+              value: "1h"
+            - name: OAUTH_TOKEN_URL
+              value: "https://id-dev.mindx.edu.vn/token"
+            - name: OAUTH_USERINFO_URL
+              value: "https://id-dev.mindx.edu.vn/me"
+            - name: OAUTH_CLIENT_ID
+              value: "mindx-onboarding"
+            - name: OAUTH_CALLBACK_URL
+              # Link này không phải mật khẩu nên có thể để đây
+              value: "https://haimindx-app-djamcah4c6b0fyb3.z03.azurefd.net/callback"
+          # ---------------------------------------------------
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10

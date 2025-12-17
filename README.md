@@ -1,14 +1,4 @@
-Tuyệt vời\! Việc chuyển sang tài liệu tiếng Anh sẽ làm cho hồ sơ của bạn chuyên nghiệp và dễ dàng chia sẻ hơn, đặc biệt khi làm việc trong môi trường công ty.
 
-Dưới đây là nội dung chi tiết cho file `README.md` **bằng tiếng Anh**, bao gồm đầy đủ các phần: **Setup, Deployment, và Authentication Flow** theo yêu cầu của dự án.
-
-Bạn có thể copy nội dung này vào file `README.md` trong repository của mình.
-
------
-
-### Mẫu Documentation (README.md) - English
-
-````markdown
 # MindX Onboarding - Week 1: Azure Fullstack Application
 
 This project is a Fullstack Web Application (ReactJS + Node.js) containerized and deployed on the Azure Kubernetes Service (AKS) infrastructure, integrating Single Sign-On (SSO) authentication using OpenID Connect with the MindX Identity system.
@@ -141,9 +131,9 @@ Apply the deployment and service configurations to the AKS cluster:
 # Get AKS credentials and configure kubectl access
 az aks get-credentials --resource-group <resource_group_name> --name <aks_cluster_name>
 
-# Apply the manifests
-kubectl apply -f k8s/backend-deployment.yaml
-kubectl apply -f k8s/frontend-deployment.yaml
+# Apply the manifests in k8s
+kubectl apply -f k8s/api-deployment.yaml
+kubectl apply -f k8s/web-deployment.yaml
 kubectl apply -f k8s/ingress.yaml
 ```
 

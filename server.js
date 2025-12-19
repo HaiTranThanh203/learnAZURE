@@ -1,3 +1,4 @@
+global.crypto = require("crypto");
 require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
@@ -7,8 +8,24 @@ const todoRoute = require("./routes/todo.route");
 const employeeRoute = require("./routes/employee.route");
 const productRoute = require("./routes/product.route");
 const cors = require("cors");
+// --- BẮT ĐẦU APP INSIGHTS ---
+const appInsights = require("applicationinsights");
+const connectionString =
+  process.env.APPLICATIONINSIGHTS_CONNECTION_STRING ||
+  process.env.APPINSIGHTS_CONNECTION_STRING;
+if (connectionString) {
+  appInsights
+    .setup(connectionString)
+    .setAutoCollectConsole(true, true) // Thu thập cả log console.log
+    .setSendLiveMetrics(true) // Cho phép xem realtime
+    .start();
+  console.log("✅ Azure Application Insights started!");
+} else {
+  console.log("⚠️ No Connection String found, App Insights disabled.");
+}
+// --- KẾT THÚC APP INSIGHTS ---
 const app = express();
-const authMiddleware = require("./middleware/authMiddleware"); 
+const authMiddleware = require("./middleware/authMiddleware");
 const authRoute = require("./routes/auth.route");
 app.use(cors());
 connectDB();
@@ -24,8 +41,11 @@ app.get("/health", (req, res) => {
 });
 app.use("/auth", authRoute);
 app.use("/todos", todoRoute);
-app.use("/employees",authMiddleware, employeeRoute);
-app.use("/products",authMiddleware, productRoute);
+app.get("/test-error", (req, res) => {
+  throw new Error("TEST ALERT: Đây là lỗi thử nghiệm để kiểm tra Azure Alert!");
+});
+app.use("/employees", authMiddleware, employeeRoute);
+app.use("/products", authMiddleware, productRoute);
 app.use((req, res, next) => {
   next(createError(404, "Not Found"));
 });

@@ -1,4 +1,4 @@
-# k8s/api-deployment.yaml
+#  k8s/api-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,9 +15,10 @@ spec:
     spec:
       imagePullSecrets:
         - name: acr-secret
+
       containers:
         - name: api-container
-          image: mindxregistryhai01.azurecr.io/my-api-image:v8
+          image: mindxregistryhai01.azurecr.io/my-api-image:v11
           ports:
             - containerPort: 3000
           resources:
@@ -25,41 +26,32 @@ spec:
               memory: "256Mi"
               cpu: "500m"
 
-          # --- CẤU HÌNH ENV (Đã tách Secret) ---
+          # --- THÊM PHẦN CẤU HÌNH BIẾN MÔI TRƯỜNG VÀ KHẮC PHỤC SSL TẠI ĐÂY ---
           env:
             - name: MOCK_AUTH_ENABLED
               value: "true"
-            
-            # --- CẤU HÌNH LẤY TỪ SECRET (Bảo mật) ---
-            - name: MONGO_URI
-              valueFrom:
-                secretKeyRef:
-                  name: api-secrets  # Tên secret đã tạo ở bước trên
-                  key: MONGO_URI
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: api-secrets
-                  key: JWT_SECRET
-            - name: OAUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: api-secrets
-                  key: OAUTH_CLIENT_SECRET
-
-            # --- CẤU HÌNH CÔNG KHAI (Có thể để trong YAML) ---
-            - name: JWT_EXPIRES_IN
-              value: "1h"
+            # 2. CẤU HÌNH MINDX SSO
             - name: OAUTH_TOKEN_URL
-              value: "https://id-dev.mindx.edu.vn/token"
+              value: "https://id-dev.mindx.edu.vn/token" # Endpoint để đổi Token
             - name: OAUTH_USERINFO_URL
-              value: "https://id-dev.mindx.edu.vn/me"
+              value: "https://id-dev.mindx.edu.vn/me" # Endpoint lấy thông tin User
             - name: OAUTH_CLIENT_ID
               value: "mindx-onboarding"
+            - name: OAUTH_CLIENT_SECRET
+              # ĐIỀN CHÍNH XÁC SECRET CỦA BẠN VÀO ĐÂY (Nên dùng Secret/ConfigMap)
+              value: "your_client_secret_here"
             - name: OAUTH_CALLBACK_URL
-              # Link này không phải mật khẩu nên có thể để đây
+              # BẮT BUỘC PHẢI KHỚP 100% VỚI LINK BẠN DÙNG ĐỂ REDIRECT
               value: "https://haimindx-app-djamcah4c6b0fyb3.z03.azurefd.net/callback"
-          # ---------------------------------------------------
+
+            # 3. CÁC BIẾN CẦN THIẾT KHÁC (JWT, DB)
+            - name: JWT_SECRET
+              value: "super_secret_key_123"
+            - name: MONGO_URI
+              value: "mongodb+srv://mindxuser:"
+            - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+              value: "your_application_insights_connection_string_here"
+          # -------------------------------------------------------------------
 
           livenessProbe:
             httpGet:
@@ -74,3 +66,4 @@ spec:
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 10
+          # ----------------------------------------
